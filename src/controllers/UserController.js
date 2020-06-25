@@ -1,6 +1,5 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-const { update } = require("../models/User");
 
 module.exports = {
   async showAll(req, res) {
@@ -74,6 +73,24 @@ module.exports = {
   async update(req, res) {
     const { name, password, email, phone } = req.body;
     const { id } = req.headers;
+
+    if (name.length < 8) {
+      return res
+        .status(400)
+        .json({ message: "Name must have more then 8 caracters" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must have more then 6 digits" });
+    }
+
+    if (phone.length < 9) {
+      return res
+        .status(400)
+        .json({ message: "Phone must have more then 9 digits" });
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
