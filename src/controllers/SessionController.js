@@ -5,6 +5,9 @@ const User = require("../models/User");
 module.exports = {
   async store(req, res) {
     const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: "Missing username or password" });
+    }
     let user = await User.findOne({ username });
     if (user) {
       const comparePassword = await bcrypt.compare(password, user.password);

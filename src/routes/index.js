@@ -17,11 +17,13 @@ router.put("/api/users/update/:id", verifyToken, UserController.update);
 router.post("/login", SessionController.store);
 
 //routes to message
-router.get("/api/toMess/:id", verifyToken, MessageController.showToUser);
-router.get("/api/fromMess/:id", verifyToken, MessageController.showFromUser);
 router.get("/api/converWith", verifyToken, MessageController.conversationsWith);
 router.post("/api/mess/add", verifyToken, MessageController.store);
-//router.put("/api/mess/:id", verifyToken, MessageController.update);
+router.put(
+  "/api/mess/readStatus/:id",
+  verifyToken,
+  MessageController.updateReadStatus
+);
 router.delete("/api/delete/:id", verifyToken, MessageController.delete);
 
 module.exports = router;

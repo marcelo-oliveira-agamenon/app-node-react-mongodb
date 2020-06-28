@@ -9,6 +9,9 @@ module.exports = {
 
   async show(req, res) {
     const { id } = req.headers;
+    if (!id || undefined) {
+      return res.status(400).json({ message: "Missing data from header" });
+    }
     let user = await User.findById(id);
     if (user) {
       return res.status(200).json({ user: user });
