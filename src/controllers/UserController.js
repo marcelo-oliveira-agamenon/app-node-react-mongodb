@@ -56,7 +56,11 @@ module.exports = {
       phone: phone,
     });
 
-    return res.status(200).json({ message: "User created!" });
+    if (user) {
+      return res.status(200).json({ message: "User created!" });
+    } else {
+      return res.status(500).json({ message: "Error insert user in database" });
+    }
   },
 
   async delete(req, res) {

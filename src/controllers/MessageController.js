@@ -1,6 +1,19 @@
 const Message = require("../models/Message");
 
 module.exports = {
+  async conversationsWith(req, res) {
+    const { to, from } = req.headers;
+    let mess = await Message.find({
+      $and: [{ toUser: { $eq: to } }, { fromUser: { $eq: from } }],
+    });
+    if (mess) {
+      return res.status(200).json({ data: mess });
+    } else {
+      return res
+        .status(400)
+        .json({ message: "There's no conversation between users" });
+    }
+  },
   async showToUser(req, res) {
     const { toUser } = req.headers;
     let mess = await Message.find(toUser);
