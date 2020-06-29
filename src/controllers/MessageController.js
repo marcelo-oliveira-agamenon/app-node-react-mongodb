@@ -12,6 +12,9 @@ module.exports = {
     });
     let toUserDetails = await User.findById(to, { name: true });
     let fromUserDetails = await User.findById(from, { name: true });
+    let unreadMsg = mess.filter((msg) => {
+      return msg.read === false;
+    });
 
     if (mess) {
       return res.status(200).json({
@@ -21,6 +24,7 @@ module.exports = {
           fromUser: fromUserDetails.name,
         },
         qtyMessages: mess.length,
+        unreadMsg: unreadMsg.length,
       });
     } else {
       return res
@@ -30,7 +34,7 @@ module.exports = {
   },
   async store(req, res) {
     const { toUser, fromUser, body, date, read } = req.body;
-    if (!toUser || !fromUser || !body || !date || !read) {
+    if (!toUser || !fromUser || !body || !date || read === undefined) {
       return res.status(400).json({ message: "Missing body fields" });
     }
     const mess = await Message.create({
