@@ -8,7 +8,7 @@ module.exports = {
     if (!username || !password) {
       return res.status(400).json({ message: "Missing username or password" });
     }
-    let user = await User.findOne({ username });
+    let user = await User.findOne({ email: { $eq: username } });
     if (user) {
       const comparePassword = await bcrypt.compare(password, user.password);
       if (comparePassword) {
