@@ -8,8 +8,8 @@ module.exports = {
   },
 
   async show(req, res) {
-    const { id } = req.headers;
-    if (!id || undefined) {
+    const { id } = req.params;
+    if (id === "" || undefined) {
       return res.status(400).json({ message: "Missing data from header" });
     }
     let user = await User.findById(id);
@@ -21,8 +21,8 @@ module.exports = {
   },
 
   async store(req, res) {
-    const { email, password, name, phone } = req.body;
-
+    const { name, password, email, phone, roles } = req.body;
+    const { location: imageUrl, key: imageKey } = req.file;
     if (name.length < 8) {
       return res
         .status(400)
@@ -53,10 +53,14 @@ module.exports = {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
-      name: name,
-      email: email,
+      name,
+      email,
       password: hashedPassword,
-      phone: phone,
+      phone,
+      imageUrl,
+      imageKey,
+      modifiedAt: null,
+      roles,
     });
 
     if (user) {
@@ -67,7 +71,10 @@ module.exports = {
   },
 
   async delete(req, res) {
-    const { id } = req.headers;
+    const { id } = req.params;
+    if (id === "" || undefined) {
+      return res.status(400).json({ message: "Missing fields in body" });
+    }
     let userDelete = await User.findByIdAndDelete(id);
 
     if (userDelete) {
@@ -78,9 +85,9 @@ module.exports = {
   },
 
   async update(req, res) {
-    const { name, password, email, phone } = req.body;
-    const { id } = req.headers;
-
+    const { name, password, email, phone, roles } = req.body;
+    const { id } = req.params;
+    const { location: imageUrl, key: imageKey } = req.file;
     if (name.length < 8) {
       return res
         .status(400)
@@ -103,10 +110,14 @@ module.exports = {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     let updateUser = await User.findByIdAndUpdate(id, {
-      name: name,
+      name,
       password: hashedPassword,
-      email: email,
-      phone: phone,
+      roles,
+      email,
+      phone,
+      imageKey,
+      imageUrl,
+      modifiedAt: Date.now(),
     });
 
     if (updateUser) {

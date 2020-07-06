@@ -22,6 +22,26 @@ let userSchema = new mongoose.Schema({
     required: true,
     minlength: 9,
   },
+  imageUrl: {
+    type: String,
+    required: true,
+  },
+  imageKey: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  modifiedAt: {
+    type: Date,
+  },
+  roles: {
+    type: String,
+    enum: ["user", "admin"],
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
