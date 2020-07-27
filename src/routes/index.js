@@ -25,6 +25,7 @@ router.put(
 
 //routes to login auth
 router.post("/login", SessionController.store);
+router.post("/resetPassword", SessionController.update);
 
 //routes to message
 router.get("/api/converWith", verifyToken, MessageController.conversationsWith);
