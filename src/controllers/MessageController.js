@@ -32,6 +32,7 @@ module.exports = {
         .json({ message: "There's no conversation between users" });
     }
   },
+
   async store(req, res) {
     const { toUser, fromUser, body, date, read } = req.body;
     if (!toUser || !fromUser || !body || !date || read === undefined) {
@@ -51,12 +52,13 @@ module.exports = {
       return res.status(400).json({ message: "Error creating message" });
     }
   },
+
   async updateReadStatus(req, res) {
-    const { messid } = req.headers;
-    if (!messid) {
+    const { id } = req.params;
+    if (!id) {
       return res.status(400).json({ message: "Missing data from header" });
     }
-    let mess = await Message.findByIdAndUpdate(messid, {
+    let mess = await Message.findByIdAndUpdate(id, {
       read: true,
     });
 
@@ -72,8 +74,9 @@ module.exports = {
       return res.status(400).json({ message: "Error in update" });
     }
   },
+
   async delete(req, res) {
-    const { id } = req.headers;
+    const { id } = req.params;
     if (!id) {
       return res.status(400).json({ message: "Missing data from header" });
     }
