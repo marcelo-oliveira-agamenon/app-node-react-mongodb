@@ -10,13 +10,13 @@ module.exports = {
     let mess = await Message.find({
       $and: [{ toUser: { $eq: to } }, { fromUser: { $eq: from } }],
     });
-    let toUserDetails = await User.findById(to, { name: true });
-    let fromUserDetails = await User.findById(from, { name: true });
-    let unreadMsg = mess.filter((msg) => {
-      return msg.read === false;
-    });
 
-    if (mess) {
+    if (mess.length !== 0) {
+      let toUserDetails = await User.findById(to, { name: true });
+      let fromUserDetails = await User.findById(from, { name: true });
+      let unreadMsg = mess.filter((msg) => {
+        return msg.read === false;
+      });
       return res.status(200).json({
         data: mess,
         dataOfUsers: {
