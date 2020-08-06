@@ -10,34 +10,29 @@ module.exports = {
       return res.status(400).json({ message: "Missing data from header" });
     }
 
-    let messToUser = await Message.find({
-      $and: [{ toUser: { $eq: to } }, { fromUser: { $eq: from } }],
+    let mess = await Message.find({
+      $or: [
+        { $and: [{ toUser: { $eq: from } }, { fromUser: { $eq: to } }] },
+        { $and: [{ toUser: { $eq: to } }, { fromUser: { $eq: from } }] },
+      ],
     })
       .limit(limit)
       .skip(number * limit)
-      .sort();
-    let messFromUser = await Message.find({
-      $and: [{ toUser: { $eq: from } }, { fromUser: { $eq: to } }],
-    })
-      .limit(limit)
-      .skip(number * limit)
-      .sort();
-    console.log(messFromUser, messToUser);
+      .sort({ date: 1 });
 
     let toUserDetails = await User.findById(to, { name: true });
     let fromUserDetails = await User.findById(from, { name: true });
-    let unreadMsg = messFromUser.filter((msg) => {
+    let unreadMsg = mess.filter((msg) => {
       return msg.read === false;
     });
+
     return res.status(200).json({
-      messagesSended: messToUser,
-      messagesReceived: messFromUser,
+      messages: mess,
       dataOfUsers: {
         toUser: toUserDetails.name,
         fromUser: fromUserDetails.name,
       },
-      qtyMessagesSended: messToUser.length,
-      qtyMessagesReceived: messFromUser.length,
+      qtyMessages: mess.length,
       unreadMsg: unreadMsg.length,
     });
   },
