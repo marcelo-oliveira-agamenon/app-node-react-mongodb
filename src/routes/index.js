@@ -28,7 +28,11 @@ router.post("/login", SessionController.store);
 router.post("/resetPassword", SessionController.update);
 
 //routes to message
-router.get("/api/converWith", verifyToken, MessageController.conversationsWith);
+router.get(
+  "/api/converWith/:number",
+  verifyToken,
+  MessageController.conversationsWith
+);
 router.post("/api/mess/add", verifyToken, MessageController.store);
 router.put(
   "/api/mess/readStatus/:id",

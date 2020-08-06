@@ -4,33 +4,42 @@ const User = require("../models/User");
 module.exports = {
   async conversationsWith(req, res) {
     const { to, from } = req.headers;
+    const { number } = req.params;
+    const limit = 5;
     if (!to || !from) {
       return res.status(400).json({ message: "Missing data from header" });
     }
-    let mess = await Message.find({
-      $and: [{ toUser: { $eq: to } }, { fromUser: { $eq: from } }],
-    });
 
-    if (mess.length !== 0) {
-      let toUserDetails = await User.findById(to, { name: true });
-      let fromUserDetails = await User.findById(from, { name: true });
-      let unreadMsg = mess.filter((msg) => {
-        return msg.read === false;
-      });
-      return res.status(200).json({
-        data: mess,
-        dataOfUsers: {
-          toUser: toUserDetails.name,
-          fromUser: fromUserDetails.name,
-        },
-        qtyMessages: mess.length,
-        unreadMsg: unreadMsg.length,
-      });
-    } else {
-      return res
-        .status(400)
-        .json({ message: "There's no conversation between users" });
-    }
+    let messToUser = await Message.find({
+      $and: [{ toUser: { $eq: to } }, { fromUser: { $eq: from } }],
+    })
+      .limit(limit)
+      .skip(number * limit)
+      .sort();
+    let messFromUser = await Message.find({
+      $and: [{ toUser: { $eq: from } }, { fromUser: { $eq: to } }],
+    })
+      .limit(limit)
+      .skip(number * limit)
+      .sort();
+    console.log(messFromUser, messToUser);
+
+    let toUserDetails = await User.findById(to, { name: true });
+    let fromUserDetails = await User.findById(from, { name: true });
+    let unreadMsg = messFromUser.filter((msg) => {
+      return msg.read === false;
+    });
+    return res.status(200).json({
+      messagesSended: messToUser,
+      messagesReceived: messFromUser,
+      dataOfUsers: {
+        toUser: toUserDetails.name,
+        fromUser: fromUserDetails.name,
+      },
+      qtyMessagesSended: messToUser.length,
+      qtyMessagesReceived: messFromUser.length,
+      unreadMsg: unreadMsg.length,
+    });
   },
 
   async store(req, res) {
